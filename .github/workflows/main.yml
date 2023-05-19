@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: singin-386108
   RUN_REGION: asia-south1
   SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
   APP_ID: continuous-deployment
