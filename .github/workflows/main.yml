@@ -16,7 +16,6 @@ jobs:
   deploy:
     name: deploy to cloud run
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, 'to deploy')"
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
