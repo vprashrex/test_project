@@ -8,7 +8,6 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   RUN_REGION: asia-south1
-  SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
   SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
   APP_ID: continuous-deployment
 
@@ -24,10 +23,10 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0.5.0
         with:
           project_id: $PROJECT_ID
-          service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
+          service_account_key: $SA_KEY_JSON
 
       - name: Authenticate with Google Cloud
-        run: gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY_JSON }}
+        run: gcloud auth activate-service-account --key-file=$SA_KEY_JSON
       
       - name: Build and deploy to Cloud Run
         run: |
