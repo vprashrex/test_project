@@ -1,25 +1,18 @@
 version: '3'
 services:
   frontend:
-    image: index.docker.io/prashrex/test
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
+    image: gcr.io/singin-386108/test2
     build:
       context: ./
       dockerfile: ./Dockerfile
     ports:
       - "3000:3000"
-    expose:
-      - 3000
+
     depends_on:
       - watchtower
-        
+    
   watchtower:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 30
-
-networks:
-  local_net:
-    driver: bridge
