@@ -26,7 +26,7 @@ jobs:
           version: '286.0.0'
           service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
           service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
-          project_id: $PROJECT_ID
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Building (🏗)
         run: |-
