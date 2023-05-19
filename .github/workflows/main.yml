@@ -1,34 +1,44 @@
-name: Deploy to Cloud Run
-
+name: Deploy 🚀 Google Cloud Run (☁🏃)
 on:
   push:
     branches:
       - main
 
 env:
-  PROJECT_ID: singin-386108
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  APP_ID: continuous-deployment
   RUN_REGION: asia-south1
   SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
-  APP_ID: continuous-deployment
 
 jobs:
   deploy:
-    name: deploy to cloud run
+    name: Deploying to google cloud
     runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, 'to deploy')"
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.5.0
+      # Build and push image to Google Container Registry
+      - name: Setting up
+        uses: google-github-actions/setup-gcloud@master
         with:
+          version: '286.0.0'
+          service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
+          service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           project_id: $PROJECT_ID
-          service_account_key: $SA_KEY_JSON
 
-      - name: Authenticate with Google Cloud
-        run: gcloud auth activate-service-account --key-file=$SA_KEY_JSON
-      
-      - name: Build and deploy to Cloud Run
-        run: |
-          gcloud builds submit --tag gcr.io/$PROJECT_ID/$APP_ID:$GITHUB_SHA
-          gcloud run deploy $APP_ID --image gcr.io/$PROJECT_ID/$APP_ID:$GITHUB_SHA --platform managed --region $RUN_REGION --allow-unauthenticated
+      - name: Building (🏗)
+        run: |-
+          gcloud builds submit \
+            --tag gcr.io/$PROJECT_ID/$APP_ID:$GITHUB_SHA
+
+      # Setup gcloud CLI
+      - name: Deploy (🚀)
+        uses: google-github-actions/deploy-cloudrun@main
+        with:
+          service: SERVICE_ID
+          image: gcr.io/$PROJECT_ID/$APP_ID:$GITHUB_SHA
+          region: $RUN_REGION
+          credentials: ${{ secrets.GCP_SA_KEY_JSON }}
+          project_id: $PROJECT_ID
