@@ -12,7 +12,7 @@ jobs:
       uses: actions/checkout@master
 
     # Setup gcloud CLI
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@main
       with:
         service_account_email: github-action-850@singin-386108.iam.gserviceaccount.com
         service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
