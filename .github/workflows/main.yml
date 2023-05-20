@@ -28,13 +28,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker buildx create --use
-          docker buildx build --push --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-service:${{ github.sha }} .
+          gcloud builds submit --tag gcr.io/singin-386108/continuous-deployment --project=singin-386108
 
       - name: Deploy to Google Cloud Run
         run: |
-          gcloud run deploy my-service \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-service:${{ github.sha }} \
-            --platform managed \
-            --region us-central1 \
-            --allow-unauthenticated
+          gcloud run deploy continuous-deployment --image gcr.io/singin-386108/continuous-deployment --platform managed --project=singin-386108 --allow-unauthenticated --region asia-south1
