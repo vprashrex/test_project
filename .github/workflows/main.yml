@@ -1,32 +1,33 @@
-# .github/workflows/deploy.yml
 name: Deploy to Cloud Run
+
 on:
   push:
     branches:
       - main
+
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  APP_ID: continous-deployment
-  RUN_REGION: asia-south1
-  SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID}}
+  SERVICE_ACCOUNT_KEY: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+  APP_ID: continuous-deployment
+
 jobs:
   deploy:
-    name: Deploy to Cloud Run
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, 'to deploy')"
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@v0.5.0
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.5.0
         with:
-          version: "290.0.1"
-          service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ env.GCP_SA_KEY_JSON }}
 
-      # Build and push image to Google Container Registry
-      - name: Build
-        run: gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}/${{ env.APP_ID }}:${{ github.sha }}
-
-      - name: Deploy
-        run: gcloud run deploy ${{ env.APP_ID }} --image gcr.io/$PROJECT_ID/$APP_ID:${{ github.sha }} --platform managed --region $RUN_REGION --allow-unauthenticated
+      - name: Authenticate with Google Cloud
+        run: gcloud auth activate-service-account --key-file=${{ env.GCP_SA_KEY_JSON }}
+      
+      - name: Build and deploy to Cloud Run
+        run: |
+          gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}//${{ env.APP_ID }}
+          gcloud run deploy ${{ env.APP_ID }} --image gcr.io/${{ env.PROJECT_ID }}/${{ env.APP_ID }} --platform managed --region asia-south1
