@@ -18,10 +18,6 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
         export_default_credentials: true
     
-    # Configure Docker with Credentials
-    - name: Configure Docker
-      run: |
-        gcloud auth configure-docker
       
     # Build the Docker image
     - name: Build & Publish
@@ -35,4 +31,4 @@ jobs:
       run: |
         gcloud run deploy continuous-deployment --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/continuous-deployment \
         --platform managed \
-        --allow-unauthenticated \
+        --allow-unauthenticated 
