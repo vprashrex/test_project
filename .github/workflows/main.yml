@@ -21,8 +21,9 @@ jobs:
 
       # Build and push image to Google Container Registry
       - name: Setting up
-        uses: google-github-actions/setup-gcloud@v1
+        uses:  google-github-actions/setup-gcloud@v0.4.3
         with:
+          version: 'latest'
           service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
           service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
