@@ -24,9 +24,7 @@ jobs:
           project_id: ${{ env.PROJECT_ID }}
           service_account_key: ${{ env.GCP_SA_KEY_JSON }}
 
-      - name: Authenticate with Google Cloud
-        run: gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY_JSON }}
-      
+
       - name: Build and deploy to Cloud Run
         run: |
           gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}//${{ env.APP_ID }}
