@@ -1,42 +1,32 @@
-name: Deploy Google Cloud Run
-
+# .github/workflows/deploy.yml
+name: Deploy to Cloud Run
 on:
   push:
     branches:
       - main
-
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  APP_ID: continuous-deployment
+  APP_ID: continous-deployment
   RUN_REGION: asia-south1
-
+  SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
 jobs:
   deploy:
-    name: Deploying to Google Cloud Run
+    name: Deploy to Cloud Run
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, 'to deploy')"
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.5.0
+      - uses: actions/checkout@v2
+
+      # Setup gcloud CLI
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          version: 'latest'
+          version: "290.0.1"
           service_account_key: ${{ secrets.GCP_SA_KEY_JSON }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-      
-      - name: Build and push Docker image
-        run: gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}/${{ env.APP_ID }}:${{ github.sha }}
-        
-      
-      - name: Deploy to Google Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v0.5.0
 
-        with:
-          services: continuous-deployment-kunjqyu4kq-el
-          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.APP_ID }}:${{ github.sha }}
-          region: ${{ env.RUN_REGION }}
-          credentials: ${{ secrets.GCP_SA_KEY_JSON }}
-          project_id: ${{ env.PROJECT_ID }}
+      # Build and push image to Google Container Registry
+      - name: Build
+        run: gcloud builds submit --tag gcr.io/${{ env.PROJECT_ID }}/${{ env.APP_ID }}:${{ github.sha }}
+
+      - name: Deploy
+        run: gcloud run deploy ${{ env.APP_ID }} --image gcr.io/$PROJECT_ID/$APP_ID:${{ github.sha }} --platform managed --region $RUN_REGION --allow-unauthenticated
