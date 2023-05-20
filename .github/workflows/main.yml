@@ -25,7 +25,9 @@ jobs:
           service_account_key: ${{ env.GCP_SA_KEY_JSON }}
 
       - name: Authenticate with Google Cloud
-        run: gcloud auth activate-service-account --key-file=./keys.json
+        run: echo "${{ secrets.GCP_SA_KEY_JSON }}" > key.json
+        run: gcloud auth activate-service-account --key-file=key.json
+        run: rm key.json
       
       - name: Build and deploy to Cloud Run
         run: |
