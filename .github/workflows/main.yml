@@ -28,6 +28,10 @@ jobs:
           service_account_email: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+      - name: Set Google Cloud project
+        run: |
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+      
       - name: Building (🏗)
         run: |-
           gcloud builds submit \
