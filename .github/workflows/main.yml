@@ -13,7 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Google Cloud SDK
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Google Cloud
         uses: google-github-actions/setup-gcloud@v0.5.0
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
@@ -21,21 +24,17 @@ jobs:
 
       - name: Configure Docker
         run: |
-          echo docker login -u _json_key --password-stdin https://gcr.io
-
-      - name: Set Google Cloud project
-        run: |
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          echo ${{ secrets.GCP_SA_KEY_JSON }} | docker login -u _json_key --password-stdin https://gcr.io
 
       - name: Build and push Docker image
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }}:${{ github.sha }} .
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }}:${{ github.sha }}
+          docker buildx create --use
+          docker buildx build --push --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-service:${{ github.sha }} .
 
       - name: Deploy to Google Cloud Run
         run: |
-          gcloud run deploy YOUR_SERVICE_NAME \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ github.repository }}:${{ github.sha }} \
+          gcloud run deploy my-service \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-service:${{ github.sha }} \
             --platform managed \
-            --region asia-south1 \
+            --region us-central1 \
             --allow-unauthenticated
