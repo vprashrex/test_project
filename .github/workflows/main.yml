@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  PROJECT_ID: ${{ secrets.CLOUD_RUN_PROJECT_NAME }}
   REGION: asia-south1
   # project-name but it can be anything you want
   REPO_NAME: continuous-deployment
@@ -23,7 +23,7 @@ jobs:
       - id: "auth"
         uses: "google-github-actions/auth@v0"
         with:
-          credentials_json: "${{ secrets.GCP_SA_KEY_JSON }}"
+          credentials_json: "${{ secrets.CLOUD_RUN_SERVICE_ACCOUNT }}"
 
       # Setup gcloud CLI/SDK
       - name: Set up Cloud SDK
